@@ -9,8 +9,10 @@ import os
 import time
 import warnings
 import numpy as np
-from utils.dtw_metric import dtw, accelerated_dtw
-from utils.augmentation import run_augmentation, run_augmentation_single
+try:
+    from utils.dtw_metric import dtw, accelerated_dtw
+except ImportError:  # optional: only needed when --use_dtw is set
+    dtw, accelerated_dtw = None, None
 
 warnings.filterwarnings('ignore')
 
@@ -238,7 +240,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             os.makedirs(folder_path)
 
         # dtw calculation
-        if self.args.use_dtw:
+        if getattr(self.args, 'use_dtw', False):
             dtw_list = []
             manhattan_distance = lambda x, y: np.abs(x - y)
             for i in range(preds.shape[0]):
